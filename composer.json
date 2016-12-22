@@ -1,0 +1,42 @@
+{
+  "name": "rx/react-promise",
+  "type": "library",
+  "description": "RxPHP v2 support for ReactPHP's Promises",
+  "keywords": [
+    "rxphp",
+    "reactivex",
+    "react",
+    "reactphp",
+    "promise",
+    "rx.php"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "David Dan",
+      "email": "davidwdan@gmail.com",
+      "role": "Developer"
+    },
+    {
+      "name": "Matt Bonneau",
+      "email": "matt@bonneau.net",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Rx\\React\\": "src/"
+    }
+  },
+  "require": {
+    "react/promise": "~2.2",
+    "wyrihaximus/react-async-interop-loop": "dev-master",
+    "reactivex/rxphp": "2.x-dev"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/davidwdan/RxPHP.git"
+    }
+  ]
+}
