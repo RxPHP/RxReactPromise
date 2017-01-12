@@ -30,7 +30,7 @@
   },
   "require": {
     "react/promise": "~2.2",
-    "wyrihaximus/react-async-interop-loop": "dev-master",
+    "wyrihaximus/react-async-interop-loop": "^0.2.2",
     "reactivex/rxphp": "2.x-dev"
   },
   "repositories": [
