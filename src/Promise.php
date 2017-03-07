@@ -3,11 +3,12 @@
 namespace Rx\React;
 
 use React\Promise\CancellablePromiseInterface;
+use React\Promise\Promise as ReactPromise;
+use React\Promise\PromiseInterface;
 use Rx\Disposable\CallbackDisposable;
 use Rx\ObservableInterface;
 use Rx\Observable;
 use Rx\Observable\AnonymousObservable;
-use Rx\Observer\CallbackObserver;
 use Rx\Subject\AsyncSubject;
 use React\Promise\Deferred;
 
@@ -15,9 +16,9 @@ final class Promise
 {
     /**
      * @param mixed $value
-     * @return \React\Promise\Promise A promise resolved to $value
+     * @return ReactPromise A promise resolved to $value
      */
-    public static function resolved($value)
+    public static function resolved($value): ReactPromise
     {
         $d = new Deferred();
         $d->resolve($value);
@@ -26,9 +27,9 @@ final class Promise
 
     /**
      * @param mixed $exception
-     * @return \React\Promise\Promise A promise rejected with $exception
+     * @return ReactPromise A promise rejected with $exception
      */
-    public static function rejected($exception)
+    public static function rejected($exception): ReactPromise
     {
         $d = new Deferred();
         $d->reject($exception);
@@ -40,14 +41,15 @@ final class Promise
      *
      * @param ObservableInterface $observable
      * @param Deferred $deferred
-     * @return \React\Promise\Promise
+     * @return ReactPromise
+     * @throws \InvalidArgumentException
      */
-    public static function fromObservable(ObservableInterface $observable, Deferred $deferred = null): \React\Promise\Promise
+    public static function fromObservable(ObservableInterface $observable, Deferred $deferred = null): ReactPromise
     {
         $d     = $deferred ?: new Deferred();
         $value = null;
 
-        $observable->subscribe(new CallbackObserver(
+        $observable->subscribe(
             function ($v) use (&$value) {
                 $value = $v;
             },
@@ -57,7 +59,7 @@ final class Promise
             function () use ($d, &$value) {
                 $d->resolve($value);
             }
-        ));
+        );
 
         return $d->promise();
     }
@@ -65,10 +67,11 @@ final class Promise
     /**
      * Converts a Promise to an Observable sequence
      *
-     * @param CancellablePromiseInterface $promise
-     * @return Observable\AnonymousObservable
+     * @param PromiseInterface $promise
+     * @return Observable
+     * @throws \InvalidArgumentException
      */
-    public static function toObservable(CancellablePromiseInterface $promise): AnonymousObservable
+    public static function toObservable(PromiseInterface $promise): Observable
     {
         $subject = new AsyncSubject();
 
@@ -87,7 +90,9 @@ final class Promise
             $disp = $subject->subscribe($observer);
             return new CallbackDisposable(function () use ($p, $disp) {
                 $disp->dispose();
-                $p->cancel();
+                if ($p instanceof CancellablePromiseInterface) {
+                    $p->cancel();
+                }
             });
         });
     }
